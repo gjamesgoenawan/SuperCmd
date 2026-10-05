@@ -1,0 +1,11 @@
+{
+  "name": "file-search-2",
+  "title": "File Search 2.0",
+  "description": "Recently added files and filename search powered by Spotlight.",
+  "version": "1.0.0",
+  "author": "gabriel",
+  "license": "MIT",
+  "icon": "icon.svg",
+  "platforms": ["macOS"],
+  "commands": [{"name":"search","title":"File Search 2.0","description":"Browse the 20 newest files or search Spotlight","mode":"view"}]
+}

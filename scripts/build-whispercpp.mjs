@@ -10,6 +10,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..');
+const macOSDeploymentTarget = process.env.MACOSX_DEPLOYMENT_TARGET || '26.0';
+const swiftArch = process.arch === 'x64' ? 'x86_64' : process.arch;
+const swiftTarget = `${swiftArch}-apple-macosx${macOSDeploymentTarget}`;
 
 const whisperVersion = 'v1.8.3';
 const frameworkUrl = `https://github.com/ggml-org/whisper.cpp/releases/download/${whisperVersion}/whisper-${whisperVersion}-xcframework.zip`;
@@ -27,6 +30,7 @@ const transcriberBinary = path.join(distNativeDir, 'whisper-transcriber');
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
     stdio: 'inherit',
+    env: { ...process.env, MACOSX_DEPLOYMENT_TARGET: macOSDeploymentTarget },
     ...options,
   });
   if (result.status !== 0) {
@@ -86,6 +90,7 @@ function buildTranscriber() {
   console.log('[whisper.cpp] Building whisper-transcriber');
   run('swiftc', [
     '-O',
+    '-target', swiftTarget,
     '-module-cache-path', moduleCacheDir,
     '-F', runtimeDir,
     '-framework', 'whisper',

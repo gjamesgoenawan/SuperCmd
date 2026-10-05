@@ -33,6 +33,8 @@ const electronAPI = {
   homeDir: _homeDir,
   platform: _platform,
 
+  startFileDrag: (filePath: string): void => { ipcRenderer.send('file-start-drag', filePath); },
+
   // ─── Lifecycle ──────────────────────────────────────────────────
   /** Signal main process that the renderer React app has mounted. */
   rendererReady: (): void => { ipcRenderer.send('renderer-ready'); },

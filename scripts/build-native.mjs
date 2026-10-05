@@ -5,13 +5,24 @@ import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
 
+// Keep every native artifact compatible with the oldest macOS release that
+// this app advertises. Without this, swiftc inherits the build machine's SDK
+// default (currently macOS 28), making the resulting app unusable on macOS 26.
+const macOSDeploymentTarget = process.env.MACOSX_DEPLOYMENT_TARGET || '26.0';
+process.env.MACOSX_DEPLOYMENT_TARGET = macOSDeploymentTarget;
+
 mkdirSync('dist/native', { recursive: true });
 
 const electronVersion = require('../node_modules/electron/package.json').version;
 const arch = process.arch;
+const swiftArch = arch === 'x64' ? 'x86_64' : arch;
+const swiftTarget = `${swiftArch}-apple-macosx${macOSDeploymentTarget}`;
 
 function run(cmd) {
-  execSync(cmd, { stdio: 'inherit' });
+  execSync(cmd, {
+    stdio: 'inherit',
+    env: { ...process.env, MACOSX_DEPLOYMENT_TARGET: macOSDeploymentTarget },
+  });
 }
 
 const swift = [
@@ -49,7 +60,7 @@ const swift = [
 ];
 
 for (const [out, src, frameworks] of swift) {
-  run(`swiftc -O -o ${out} ${src} ${frameworks}`);
+  run(`swiftc -O -target ${swiftTarget} -o ${out} ${src} ${frameworks}`);
 }
 
 // Build native Node addon (native_helpers.node)

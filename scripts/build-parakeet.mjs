@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..');
+const macOSDeploymentTarget = process.env.MACOSX_DEPLOYMENT_TARGET || '26.0';
 
 const packageDir = path.join(repoRoot, 'src', 'native', 'parakeet-transcriber');
 const distNativeDir = path.join(repoRoot, 'dist', 'native');
@@ -28,6 +29,7 @@ function run(command, args, options = {}) {
   console.log(`[parakeet] Running: ${command} ${args.join(' ')}`);
   const result = spawnSync(command, args, {
     stdio: 'inherit',
+    env: { ...process.env, MACOSX_DEPLOYMENT_TARGET: macOSDeploymentTarget },
     ...options,
   });
   if (result.status !== 0) {

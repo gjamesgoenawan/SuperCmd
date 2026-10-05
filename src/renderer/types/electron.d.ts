@@ -833,6 +833,7 @@ export interface AutoQuitAppEntry {
 }
 
 export interface ElectronAPI {
+  startFileDrag: (filePath: string) => void;
   // Lifecycle
   rendererReady: () => void;
   // Calculator (SoulverCore)

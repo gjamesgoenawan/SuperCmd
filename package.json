@@ -98,6 +98,7 @@
       "output": "out"
     },
     "mac": {
+      "minimumSystemVersion": "26.0",
       "category": "public.app-category.utilities",
       "icon": "supercmd.icns",
       "target": [

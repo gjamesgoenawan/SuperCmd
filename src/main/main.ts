@@ -16266,6 +16266,20 @@ return appURL's |path|() as text`,
     return resolveAppIconDataUrl(appPath, size);
   });
 
+  // Native file dragging is required for cross-app drops (e.g. browser uploads).
+  // Keep the handoff synchronous with the renderer's dragstart event.
+  ipcMain.on('file-start-drag', (event: Electron.IpcMainEvent, filePath: unknown) => {
+    if (event.sender !== mainWindow?.webContents) return;
+    if (typeof filePath !== 'string' || !path.isAbsolute(filePath)) return;
+    try {
+      if (!fs.statSync(filePath).isFile()) return;
+      const icon = nativeImage.createFromDataURL('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAPElEQVR4nO3SwQkAMAgEQcuzsBScDkwLeYiEMAv+B7kIvVyuXR0HAAAA0Aa47d8PANgAgA0AAACMAzTRAdhCI8a1ED7jAAAAAElFTkSuQmCC');
+      event.sender.startDrag({ file: filePath, icon });
+    } catch (error) {
+      console.warn('[FileDrag] Could not start native file drag:', error);
+    }
+  });
+
   ipcMain.handle('file-search-query', async (_event: any, query: string, options?: { limit?: number }) => {
     return await searchIndexedFiles(query, { limit: Number(options?.limit) || undefined });
   });
